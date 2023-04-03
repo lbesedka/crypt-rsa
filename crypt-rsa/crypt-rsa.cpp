@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+//generation big prime numbers
 std::tuple<BigInt, int, BigInt> power2(BigInt a) {
 	int counter = 0;
 	BigInt a_new = a - 1;
@@ -19,9 +19,6 @@ std::tuple<BigInt, int, BigInt> power2(BigInt a) {
 	cout << "d " << a_new << endl;
 	return tuple<BigInt, int, BigInt> (a_new, counter, a);
 }
-
-
-
 
 BigInt modpow(BigInt base, BigInt exp, BigInt modulus)
 {
@@ -92,16 +89,62 @@ BigInt generate_prime()
 	}
 	return a;
 }
+//encrypt key
+BigInt key(BigInt p, BigInt q) {
+	BigInt e = big_random(digits_length);
+	BigInt pq_1 = (p - 1)*(q - 1);
+	while (gcd(e, pq_1) != 1) {
+		e = big_random(digits_length);
+	}
+	cout << e << endl; 
+	return e; 
+}
+// for decrypt key
+tuple<BigInt, BigInt, BigInt> extended_gcd(BigInt a, BigInt p, BigInt q){
+	BigInt b = (p - 1) * (q - 1); 
+	BigInt x = 0, y = 1, u = 1, v = 0;
+	while (a != 0) {
+		BigInt q = b / a;
+		BigInt r = b % a;
+		BigInt m = x - u * q;
+		BigInt n = y - v * q;
+		b = a;
+		a = r;
+		x = u;
+		y = v;
+		u = m;
+		v = n;
+	}
+	return make_tuple(b, x, y);
+}
 
+BigInt mod_inverse(BigInt a, BigInt p, BigInt q)
+{
+	BigInt g, x, y;
+	BigInt m = (p - 1) * (q - 1);
+	tie(g, x, y) = extended_gcd(a, p, q);
+	if (g != 1) {
+		return -1;   // inverse doesn't exist
+	}
+	return (x % m + m) % m;   
+}
 
 
 
 int main()
 {
 
-	BigInt p = generate_prime();
-	BigInt q = generate_prime();
+	//BigInt p = generate_prime();
+	//BigInt q = generate_prime();
+	BigInt p ("8279170237136523271263427");
+	BigInt q ("9223448226441434779857647");
+	BigInt e("9527360111833535202863801");
 	cout << p << endl;
 	cout << q << endl;
-
+	cout << e << endl;
+	//BigInt d = extended_gcd(e, p, q);
+	BigInt d = mod_inverse(e, p, q);
+	cout << d << endl; 
+	//cout << d << endl; 
+	//key(p, q); 
 }
