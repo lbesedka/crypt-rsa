@@ -112,6 +112,7 @@ class BigInt {
         std::string to_string() const;
         int to_int() const;
         long to_long() const;
+        unsigned long to_ulong() const;
         long long to_long_long() const;
 
         // Random number generating functions:
@@ -408,6 +409,10 @@ int BigInt::to_int() const {
 
 long BigInt::to_long() const {
     return std::stol(this->to_string());
+}
+
+unsigned long BigInt::to_ulong() const {
+    return std::stoul(this->to_string());
 }
 
 

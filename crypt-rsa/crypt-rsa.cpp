@@ -96,7 +96,6 @@ BigInt key(BigInt p, BigInt q) {
 	while (gcd(e, pq_1) != 1) {
 		e = big_random(digits_length);
 	}
-	cout << e << endl; 
 	return e; 
 }
 // for decrypt key
@@ -129,22 +128,101 @@ BigInt mod_inverse(BigInt a, BigInt p, BigInt q)
 	return (x % m + m) % m;   
 }
 
+std::bitset<32> convertTexttoBit(string str) {
+	bitset<32> bits;
+	for (int i = 0; i < 4; ++i) {
+		char c = str[i];
+		for (int j = 7; j >= 0 && c; --j) {
+			if (c & 0x1) {
+				bits.set(8 * i + j);
+			}
+			c >>= 1;
+		}
+	}
+	return bits;
+};
 
+unsigned long int decimal_system(bitset<32> bits) {
+	unsigned long int number_text = bits.to_ulong(); 
+	return number_text; 
+}
+
+BigInt encode(BigInt p, BigInt q, BigInt e, unsigned long int message) {
+	BigInt encode_message = modpow(BigInt(message), e, (p * q));
+	return encode_message;
+}
+
+BigInt decode(BigInt p, BigInt q, BigInt d, BigInt chipher_message) {
+	BigInt plain = modpow(chipher_message, d, (p * q));
+	return plain;
+}
+
+bitset<8> XorReverse(bitset<8> to_reverse)
+{
+	bitset<8> result;
+	for (int i = 0; i < 4; i++)
+	{
+		bitset<1> function = to_reverse[i] ^ to_reverse[7 - i];
+		result[i] = to_reverse[i] ^ function[0];
+		result[7 - i] = to_reverse[7 - i] ^ function[0];
+	}
+	return result;
+}
+
+string BitsetToChar(bitset<32> bits) {
+	char s[5];
+	bitset<8> c;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 7; j >= 0; j--) {
+			c[j] = bits[j + 8 * i];
+		}
+		c = XorReverse(c);
+		long character = c.to_ulong();
+		s[i] = char(c.to_ulong());
+		//s[7 - i] = c.to_ulong();
+	}
+	s[4] = '\0';
+	return (string)s;
+};
+
+vector<string> PreparateText(string text) {
+	vector<string> preparedStrings;
+	string tmp = "";
+	while (text.length() % 4 != 0)
+	{
+		text += "a";
+	}
+	for (int i = 0; i < text.length(); i++) {
+		tmp += text[i];
+		if ((i + 1) % 4 == 0 && i != 0)
+		{
+			preparedStrings.push_back(tmp);
+			tmp = "";
+		}
+	}
+	return preparedStrings;
+}
 
 int main()
 {
 
-	//BigInt p = generate_prime();
-	//BigInt q = generate_prime();
-	BigInt p ("8279170237136523271263427");
-	BigInt q ("9223448226441434779857647");
-	BigInt e("9527360111833535202863801");
-	cout << p << endl;
-	cout << q << endl;
-	cout << e << endl;
-	//BigInt d = extended_gcd(e, p, q);
+	BigInt p = generate_prime();
+	BigInt q = generate_prime();
+	string text = "ecdg";
+	bitset<32> textw;
+	textw = convertTexttoBit(text);
+	cout << textw << endl; 
+	unsigned long int number = decimal_system(textw);
+	cout << number << endl;
+	BigInt e = key(p, q);
+	BigInt chipher_text = encode(p, q, e, number);
+	cout << chipher_text << endl; 
 	BigInt d = mod_inverse(e, p, q);
-	cout << d << endl; 
-	//cout << d << endl; 
-	//key(p, q); 
+	BigInt decoding_text = decode(p, q, d, chipher_text);
+	cout << decoding_text << endl; 
+	cout << decoding_text.to_string() << endl;
+	cout << bitset<32>(decoding_text.to_ulong()) << endl; 
+	cout << BitsetToChar(bitset<32>(decoding_text.to_ulong())) << endl;
+
+
 }
