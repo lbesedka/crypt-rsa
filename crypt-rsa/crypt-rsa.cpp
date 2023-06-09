@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "BigInt.hpp"
-#define digits_length 25
+#define digits_length 100
 
 using namespace std;
 
 //generation big prime numbers
+
 std::tuple<BigInt, int, BigInt> power2(BigInt a) {
 	int counter = 0;
 	BigInt a_new = a - 1;
@@ -208,20 +209,32 @@ int main()
 
 	BigInt p = generate_prime();
 	BigInt q = generate_prime();
-	string text = "ecdg";
+	cout << "p:" << endl; 
+	cout << p << endl; 
+	cout << "q:" << endl;
+	cout << q << endl; 
+	string text = "my RSA realization";
+	cout << "Plain text" << endl; 
+	cout << text << endl; 
 	bitset<32> textw;
 	textw = convertTexttoBit(text);
-	cout << textw << endl; 
+	//cout << textw << endl; 
 	unsigned long int number = decimal_system(textw);
-	cout << number << endl;
+	//cout << number << endl;
 	BigInt e = key(p, q);
+	cout << "e: " << endl; 
+	cout << e << endl; 
 	BigInt chipher_text = encode(p, q, e, number);
+	cout << "Encrypted text:" << endl;
 	cout << chipher_text << endl; 
+	cout << "d: " << endl; 
 	BigInt d = mod_inverse(e, p, q);
+	cout << d << endl;
 	BigInt decoding_text = decode(p, q, d, chipher_text);
-	cout << decoding_text << endl; 
-	cout << decoding_text.to_string() << endl;
-	cout << bitset<32>(decoding_text.to_ulong()) << endl; 
+	//cout << decoding_text << endl; 
+	cout << "Decrypted text:" << endl;
+	//cout << decoding_text.to_string() << endl;
+	//cout << bitset<32>(decoding_text.to_ulong()) << endl; 
 	cout << BitsetToChar(bitset<32>(decoding_text.to_ulong())) << endl;
 
 
