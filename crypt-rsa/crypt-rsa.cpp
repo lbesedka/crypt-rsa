@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "BigInt.hpp"
-#define digits_length 100
+#define digits_length 50
 
 using namespace std;
 
@@ -38,7 +38,7 @@ bool MillerRabinTest(BigInt d,BigInt n, int s) {
 	cout << "Modulo " << n << endl;
 	// d * 2^s
 	//pair<BigInt, int> p = power2(n);
-	cout << " stepen " << d << endl;
+	cout << "Power " << d << endl;
 	BigInt a = big_random(digits_length + 2)%(n-2)+1;
 	//BigInt a = 5; 
 	cout << "Base " << a << endl;
@@ -129,9 +129,9 @@ BigInt mod_inverse(BigInt a, BigInt p, BigInt q)
 	return (x % m + m) % m;   
 }
 
-std::bitset<32> convertTexttoBit(string str) {
-	bitset<32> bits;
-	for (int i = 0; i < 4; ++i) {
+std::bitset<64> convertTexttoBit(string str) {
+	bitset<64> bits;
+	for (int i = 0; i < 8; ++i) {
 		char c = str[i];
 		for (int j = 7; j >= 0 && c; --j) {
 			if (c & 0x1) {
@@ -143,12 +143,12 @@ std::bitset<32> convertTexttoBit(string str) {
 	return bits;
 };
 
-unsigned long int decimal_system(bitset<32> bits) {
-	unsigned long int number_text = bits.to_ulong(); 
+unsigned long long decimal_system(bitset<64> bits) {
+	unsigned long long number_text = bits.to_ullong(); 
 	return number_text; 
 }
 
-BigInt encode(BigInt p, BigInt q, BigInt e, unsigned long int message) {
+BigInt encode(BigInt p, BigInt q, BigInt e, unsigned long long message) {
 	BigInt encode_message = modpow(BigInt(message), e, (p * q));
 	return encode_message;
 }
@@ -186,6 +186,28 @@ string BitsetToChar(bitset<32> bits) {
 	return (string)s;
 };
 
+unsigned char reverse(unsigned char b) {
+	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+	b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+	b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+	return b;
+}
+
+string ImprPrint(BigInt mes)
+{
+	 string res = "";
+	 unsigned char cur_num;
+	 while ((mes / 256) != 0)
+	 {
+		 cur_num = reverse(static_cast<char>((mes % 256).to_ulong()));
+		 res += cur_num;
+		 mes /= 256;
+	 }
+	 cur_num = reverse(static_cast<char>((mes % 256).to_ulong()));
+	 res += cur_num;
+	 return res;
+}
+
 vector<string> PreparateText(string text) {
 	vector<string> preparedStrings;
 	string tmp = "";
@@ -213,13 +235,13 @@ int main()
 	cout << p << endl; 
 	cout << "q:" << endl;
 	cout << q << endl; 
-	string text = "my RSA realization";
+	string text = "my RSA  ";
 	cout << "Plain text" << endl; 
 	cout << text << endl; 
-	bitset<32> textw;
+	bitset<64> textw;
 	textw = convertTexttoBit(text);
 	//cout << textw << endl; 
-	unsigned long int number = decimal_system(textw);
+	unsigned long long number = decimal_system(textw);
 	//cout << number << endl;
 	BigInt e = key(p, q);
 	cout << "e: " << endl; 
@@ -235,7 +257,5 @@ int main()
 	cout << "Decrypted text:" << endl;
 	//cout << decoding_text.to_string() << endl;
 	//cout << bitset<32>(decoding_text.to_ulong()) << endl; 
-	cout << BitsetToChar(bitset<32>(decoding_text.to_ulong())) << endl;
-
-
+	cout << ImprPrint(decoding_text) << endl;
 }
