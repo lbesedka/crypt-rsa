@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "BigInt.hpp"
-#define digits_length 50
+#define digits_length 10
 
 using namespace std;
 
@@ -79,7 +79,7 @@ BigInt generate_prime()
 		a = big_random(digits_length);
 		cout << "______________________________________________________" << endl;
 		cout << "start num " << a << endl;
-		if (a % 2 == 0) {
+		 while (a % 2 == 0) {
 			cout << "Regenerate" << endl;
 			a = big_random(digits_length);
 			cout << "new regenerated num " << a << endl;
